@@ -1,2 +1,5 @@
 node_modules/
 dist/
+
+# Internal planning/scaffolding artifacts (not part of the deliverable)
+.agents/
