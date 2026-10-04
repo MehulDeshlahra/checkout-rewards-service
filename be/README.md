@@ -184,3 +184,104 @@ Share a public or access-granted Git repository containing:
 State the approximate time spent. If something is incomplete, tell us directly and explain how you would finish it.
 
 Good luck—we are looking forward to discussing your reasoning.
+
+---
+
+# Implementation Notes
+
+Everything below documents the submitted implementation. The assignment brief
+above is preserved verbatim.
+
+## Setup
+
+Requirements:
+
+- Node.js `>= 20` (developed on Node 24).
+- npm.
+
+Install dependencies:
+
+```bash
+cd be
+npm install
+```
+
+Dependencies are pinned to exact versions: `fastify`, `zod` (runtime);
+`typescript`, `vitest`, `tsx`, `@types/node` (dev). No private services or
+credentials are required.
+
+## Run
+
+Start the service with seed data loaded:
+
+```bash
+npm run dev     # or: npm start  (both run tsx src/server.ts)
+```
+
+The server listens on `http://localhost:3000` by default. Override with the
+`PORT` and `HOST` environment variables. Reward config is set via `REWARD_N`
+and `REWARD_X` (see Seed data). Invalid reward config fails fast: the process
+exits before listening.
+
+Quick smoke test once it is running:
+
+```bash
+curl -s http://localhost:3000/products
+```
+
+## Seed data
+
+The store is seeded in memory on every start (and on each test's app build).
+Six products are seeded, including one deliberately limited item:
+
+| id | name | priceCents | inventory |
+|----|------|-----------|-----------|
+| `p_coffee` | Bag of Coffee | 1299 | 100 |
+| `p_mug` | Ceramic Mug | 850 | 100 |
+| `p_grinder` | Burr Grinder | 7499 | 100 |
+| `p_filters` | Paper Filters (100ct) | 599 | 100 |
+| `p_scale` | Precision Scale | 3250 | 100 |
+| `p_limited` | Limited Edition Tin | 2500 | **3** |
+
+`p_limited` (stock 3) is the limited-inventory product the oversell/concurrency
+tests exercise.
+
+Reward config defaults to `n = 5`, `x = 10` (every 5th placed order makes one
+10%-off coupon available). Override with environment variables:
+
+```bash
+REWARD_N=5 REWARD_X=10 npm start
+```
+
+`n` must be an integer `>= 1`; `x` must be an integer in `[0, 100]`. Invalid
+values are rejected at startup.
+
+## Test
+
+```bash
+npm test        # vitest run — single non-watch pass
+```
+
+To target one file:
+
+```bash
+npx vitest run test/concurrency.test.ts
+```
+
+The suite includes competing/repeated-operation tests (oversell race, coupon
+race, idempotent retry, report-under-concurrency), made deterministic by the
+serial executor's FIFO ordering rather than timing/sleeps.
+
+Type-check and compile:
+
+```bash
+npm run build   # tsc -p tsconfig.json
+```
+
+## API and decisions
+
+- [API.md](./API.md) — every endpoint: method, path, request, response, status,
+  and error cases. Admin endpoints are marked administrative.
+- [DECISIONS.md](./DECISIONS.md) — invariants, chosen semantics, material design
+  decisions, concurrency/idempotency strategy, money rules, error model,
+  implemented-vs-deferred, multi-instance evolution, AI use, and time spent.
