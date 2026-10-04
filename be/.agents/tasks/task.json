@@ -1,0 +1,7 @@
+{
+  "task_id": "task-reliable-checkout-rewards",
+  "task_description": "Implement the backend Reliable Checkout and Rewards Service per be/.agents/tasks/design.md (approved) with all 5 design-review findings and 2 NITs folded in. TypeScript strict + Node>=20 + Fastify, in-memory Maps, single SerialExecutor for all mutations, synchronous snapshot reads, integer-cents money, zod validation, Vitest. Deliverables: working seeded service, meaningful concurrency/idempotency/failure tests (npm test green), API docs, and a heavily-weighted DECISIONS.md.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "blocked_reason": null
+}
